@@ -17,4 +17,12 @@ import com.tianji.learning.domain.vo.LearningLessonVO;
 public interface ILearningLessonService extends IService<LearningLesson> {
 
     PageDTO<LearningLessonVO> queryMyLessonsByPage(PageQuery query);
+
+    LearningLessonVO queryMyCurrentLesson();
+
+    void deleteExpireCourse(Long courseId);
+
+    LearningLessonVO queryLearningLessonStatus(Long courseId);
+
+    Long isLessonValid(Long courseId);
 }

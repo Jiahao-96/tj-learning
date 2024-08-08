@@ -7,12 +7,11 @@ import com.tianji.learning.domain.vo.LearningLessonVO;
 import com.tianji.learning.service.ILearningLessonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -34,4 +33,29 @@ public class LearningLessonController {
     public PageDTO<LearningLessonVO> queryMyLessonsByPage(PageQuery query){
         return learningLessonService.queryMyLessonsByPage(query);
     }
+
+    @GetMapping("/now")
+    @ApiOperation("查询最近学习的课程信息")
+    public LearningLessonVO queryMyCurrentLesson(){
+        return learningLessonService.queryMyCurrentLesson();
+    }
+
+    @DeleteMapping("/lessons/{courseId}")
+    @ApiOperation("删除失效课程")
+    public void DeleteExpireCourse(@ApiParam("课程id") @PathVariable Long courseId){
+        learningLessonService.deleteExpireCourse(courseId);
+    }
+
+    @GetMapping("/lessons/{courseId}")
+    @ApiOperation("查询指定课程的信息")
+    public LearningLessonVO queryLearningLessonStatus(@ApiParam("课程id") @PathVariable Long courseId){
+        return learningLessonService.queryLearningLessonStatus(courseId);
+    }
+
+    @GetMapping("/{courseId}/valid")
+    @ApiOperation("检验用户能否学习当前课程")
+    public Long isLessonValid(@ApiParam("课程id") @PathVariable("courseId") Long courseId){
+        return learningLessonService.isLessonValid(courseId);
+    }
+
 }
