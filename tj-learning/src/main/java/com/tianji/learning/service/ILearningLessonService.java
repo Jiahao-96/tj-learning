@@ -2,6 +2,7 @@ package com.tianji.learning.service;
 
 import com.tianji.common.domain.dto.PageDTO;
 import com.tianji.common.domain.query.PageQuery;
+import com.tianji.learning.domain.dto.LearningPlanDTO;
 import com.tianji.learning.domain.po.LearningLesson;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tianji.learning.domain.vo.LearningLessonVO;
@@ -25,4 +26,10 @@ public interface ILearningLessonService extends IService<LearningLesson> {
     LearningLessonVO queryLearningLessonStatus(Long courseId);
 
     Long isLessonValid(Long courseId);
+
+    /**
+     * 创建学习计划
+     * @param learningPlanDTO
+     */
+    void createLearningPlans(LearningPlanDTO learningPlanDTO);
 }

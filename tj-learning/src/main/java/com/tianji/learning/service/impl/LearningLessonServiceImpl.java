@@ -13,9 +13,11 @@ import com.tianji.common.exceptions.BadRequestException;
 import com.tianji.common.utils.BeanUtils;
 import com.tianji.common.utils.CollUtils;
 import com.tianji.common.utils.UserContext;
+import com.tianji.learning.domain.dto.LearningPlanDTO;
 import com.tianji.learning.domain.po.LearningLesson;
 import com.tianji.learning.domain.vo.LearningLessonVO;
 import com.tianji.learning.enums.LessonStatus;
+import com.tianji.learning.enums.PlanStatus;
 import com.tianji.learning.mapper.LearningLessonMapper;
 import com.tianji.learning.service.ILearningLessonService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -152,6 +154,33 @@ public class LearningLessonServiceImpl extends ServiceImpl<LearningLessonMapper,
             log.error("课程已过期");
         }
         return lesson.getId();
+    }
+
+    /**
+     * 创建学习计划
+     * @param learningPlanDTO
+     */
+    @Override
+    public void createLearningPlans(LearningPlanDTO learningPlanDTO) {
+        Long userId = UserContext.getUser();
+        LearningLesson lesson = lambdaQuery()
+                .eq(LearningLesson::getUserId,userId)
+                .eq(LearningLesson::getCourseId,learningPlanDTO.getCourseId())
+                .one();
+        if(lesson == null){
+            throw new BadRequestException("课程信息不存在");
+        }
+        if(lesson.getStatus() == LessonStatus.EXPIRED.getValue()){
+            throw new BadRequestException("课程已失效");
+        }
+        //更新学习计划
+        LearningLesson newLesson = new LearningLesson();
+        newLesson.setId(lesson.getId());
+        newLesson.setWeekFreq(learningPlanDTO.getFreq());
+        if(lesson.getPlanStatus() == PlanStatus.NO_PLAN.getValue()){
+            newLesson.setPlanStatus(PlanStatus.PLAN_RUNNING.getValue());
+        }
+        updateById(newLesson);
     }
 
 
