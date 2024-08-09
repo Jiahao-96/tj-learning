@@ -5,6 +5,7 @@ import com.tianji.common.domain.dto.PageDTO;
 import com.tianji.common.domain.query.PageQuery;
 import com.tianji.learning.domain.dto.LearningPlanDTO;
 import com.tianji.learning.domain.vo.LearningLessonVO;
+import com.tianji.learning.domain.vo.LearningPlanPageVO;
 import com.tianji.learning.service.ILearningLessonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -66,7 +67,11 @@ public class LearningLessonController {
         learningLessonService.createLearningPlans(learningPlanDTO);
     }
 
-
+    @GetMapping("/plans")
+    @ApiOperation("查询我的学习计划(与进度)")
+    public LearningPlanPageVO queryMyLearningPlans(PageQuery query){
+        return learningLessonService.queryMyLearningPlans(query);
+    }
 
 }
 
