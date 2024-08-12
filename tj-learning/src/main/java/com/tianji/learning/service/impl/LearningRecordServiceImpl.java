@@ -13,14 +13,12 @@ import com.tianji.learning.domain.po.LearningLesson;
 import com.tianji.learning.domain.po.LearningRecord;
 import com.tianji.learning.enums.LessonStatus;
 import com.tianji.learning.enums.SectionType;
-import com.tianji.learning.mapper.LearningLessonMapper;
 import com.tianji.learning.mapper.LearningRecordMapper;
 import com.tianji.learning.service.ILearningLessonService;
 import com.tianji.learning.service.ILearningRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 /**
@@ -142,7 +140,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
             }
             return true;
         }
-        //之前看过，但是这次没看完
+        //之前看过，但是这次没看完，或者之前已经看完了
         oldRecord.setMoment(learningRecordFormDTO.getMoment());
         boolean success = updateById(oldRecord);
         if(!success){
