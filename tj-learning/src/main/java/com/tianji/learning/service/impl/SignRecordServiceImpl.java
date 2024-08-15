@@ -1,9 +1,12 @@
 package com.tianji.learning.service.impl;
 
+import com.tianji.common.autoconfigure.mq.RabbitMqHelper;
+import com.tianji.common.constants.MqConstants;
 import com.tianji.common.exceptions.BizIllegalException;
 import com.tianji.common.utils.CollUtils;
 import com.tianji.common.utils.DateUtils;
 import com.tianji.common.utils.UserContext;
+import com.tianji.learning.domain.dto.SignInMessageDTO;
 import com.tianji.learning.domain.vo.SignResultVO;
 import com.tianji.learning.service.ISignRecordService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SignRecordServiceImpl implements ISignRecordService {
     private final StringRedisTemplate redisTemplate;
-
+    private final RabbitMqHelper rabbitMqHelper;
+    /**
+     * 添加签到记录
+     * @return
+     */
     @Override
     public SignResultVO addSignRecord() {
         SignResultVO vo = new SignResultVO();
@@ -65,13 +72,21 @@ public class SignRecordServiceImpl implements ISignRecordService {
             rewardPoints = 40;
         }
         //保存积分明细记录 todo
-
+        rabbitMqHelper.send(
+                MqConstants.Exchange.LEARNING_EXCHANGE,
+                MqConstants.Key.SIGN_IN,
+                SignInMessageDTO.of(userId, rewardPoints+1)
+        );
         //封装结果
         vo.setSignDays(days);
         vo.setRewardPoints(rewardPoints);
         return vo;
     }
 
+    /**
+     * 查询签到记录
+     * @return
+     */
     @Override
     public Byte[] querySignRecords() {
         LocalDate today = LocalDate.now();
@@ -96,10 +111,6 @@ public class SignRecordServiceImpl implements ISignRecordService {
             array[i] =  Byte.valueOf((byte) (score & 1));
             score>>>=1;
         }
-
         return array;
     }
-
-
-
 }
