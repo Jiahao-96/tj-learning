@@ -24,6 +24,8 @@ spring:
             refresh: false
           - data-id: shared-mq.yaml # 共享mq配置
             refresh: false
+          - data-id: shared-mongo.yaml
+            refresh: false
 tj:
   swagger:
     enable: true
@@ -40,3 +42,7 @@ tj:
   auth:
     resource:
       enable: true
+  mongo:
+    username: "tjxt" #MongoDB数据库的帐号
+    password: "123" #MongoDB数据库的密码
+    database: interaction #MongoDB数据库名称
