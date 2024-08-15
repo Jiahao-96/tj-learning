@@ -1,14 +1,19 @@
 package com.tianji.learning.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tianji.common.utils.CollUtils;
 import com.tianji.common.utils.DateUtils;
+import com.tianji.common.utils.UserContext;
 import com.tianji.learning.domain.po.PointsRecord;
+import com.tianji.learning.domain.vo.PointsStatisticsVO;
 import com.tianji.learning.enums.PointsRecordType;
 import com.tianji.learning.mapper.PointsRecordMapper;
 import com.tianji.learning.service.IPointsRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -64,4 +69,29 @@ public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, Poi
         // 3.判断并返回
         return points == null ? 0 : points;
     }
+
+    @Override
+    public List<PointsStatisticsVO> queryMyPointsToday() {
+        Long userId = UserContext.getUser();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = DateUtils.getDayStartTime(now);
+        LocalDateTime end = DateUtils.getDayEndTime(now);
+        //统计当前用户今天的累计积分
+        List<PointsRecord> recordList = baseMapper.queryPointsStatistics(userId, start, end);
+        if (CollUtils.isEmpty(recordList)) {
+            return CollUtils.emptyList();
+        }
+
+        //封装结果
+        return recordList.stream()
+                .map(record->{
+                    PointsStatisticsVO vo = new PointsStatisticsVO();
+                    vo.setType(record.getType().getDesc());
+                    vo.setMaxPoints(record.getType().getMaxPoints());
+                    vo.setPoints(record.getPoints());
+                    return vo;
+                })
+                .collect(Collectors.toList());
+    }
+
 }
