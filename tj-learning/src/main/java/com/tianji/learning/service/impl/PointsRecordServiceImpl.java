@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tianji.common.utils.CollUtils;
 import com.tianji.common.utils.DateUtils;
 import com.tianji.common.utils.UserContext;
+import com.tianji.learning.constants.RedisConstants;
 import com.tianji.learning.domain.po.PointsRecord;
 import com.tianji.learning.domain.vo.PointsStatisticsVO;
 import com.tianji.learning.enums.PointsRecordType;
 import com.tianji.learning.mapper.PointsRecordMapper;
 import com.tianji.learning.service.IPointsRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,8 +20,9 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, PointsRecord> implements IPointsRecordService {
-
+    private StringRedisTemplate stringRedisTemplate;
     @Override
     public void addPointRecord(Long userId, int point, PointsRecordType recordType) {
 
@@ -44,14 +48,20 @@ public class PointsRecordServiceImpl extends ServiceImpl<PointsRecordMapper, Poi
                 realPoints = maxPoints - currentPoints;
             }
         }
-
+        //算完之后，本次行为不能记录分值了，就直接结束
+        if (realPoints <= 0) {
+            return;
+        }
         // 3-没有，直接保存积分记录(没上限直接保存)
         PointsRecord pointsRecord = new PointsRecord();
         pointsRecord.setType(recordType);
         pointsRecord.setUserId(userId);
         pointsRecord.setPoints(realPoints);
-
         save(pointsRecord);
+
+        //3. 保存到Redis里统计榜单排名
+        String boardCacheKey = RedisConstants.POINTS_BOARD_KEY_PREFIX + now.format(DateUtils.POINTS_BOARD_SUFFIX_FORMATTER);
+        stringRedisTemplate.opsForZSet().incrementScore(boardCacheKey, userId.toString(), realPoints);
     }
 
     private int queryUserPointsByTypeAndDate(Long userId,

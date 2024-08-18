@@ -8,9 +8,14 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * 学霸天梯榜 Mapper 接口
  * </p>
  *
- * @author jiahao
- * @since 2024-08-15
+ * @author liuyp
+ * @since 2023-07-18
  */
 public interface PointsBoardMapper extends BaseMapper<PointsBoard> {
 
+    /**
+     * 创建榜单表
+     * @param tableName 表名称
+     */
+    void createTable(String tableName);
 }

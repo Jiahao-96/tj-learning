@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tianji.learning.mapper.PointsBoardMapper">
-
+    <insert id="createTable">
+        create table `${tableName}`
+        (
+            id      bigint   not null comment '榜单id，也作为排名' primary key,
+            user_id bigint   not null comment '学生id',
+            points  int      not null comment '积分值'
+        )comment '学霸天梯榜' charset = utf8mb4;
+    </insert>
 </mapper>
